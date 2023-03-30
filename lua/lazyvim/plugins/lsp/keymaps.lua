@@ -47,7 +47,7 @@ function M.get()
     }
     if require("lazyvim.util").has("inc-rename.nvim") then
       M._keys[#M._keys + 1] = {
-        "<leader>cr",
+        "<leader>cR",
         function()
           require("inc_rename")
           return ":IncRename " .. vim.fn.expand("<cword>")
@@ -57,7 +57,7 @@ function M.get()
         has = "rename",
       }
     else
-      M._keys[#M._keys + 1] = { "<leader>cr", vim.lsp.buf.rename, desc = "Rename", has = "rename" }
+      M._keys[#M._keys + 1] = { "<leader>cR", vim.lsp.buf.rename, desc = "Rename", has = "rename" }
     end
   end
   return M._keys
