@@ -4,7 +4,7 @@ return {
   {
     "L3MON4D3/LuaSnip",
     build = (not jit.os:find("Windows"))
-        and "echo -e 'NOTE: jsregexp is optional, so not a big deal if it fails to build\n'; make install_jsregexp"
+        and "echo 'NOTE: jsregexp is optional, so not a big deal if it fails to build'; make install_jsregexp"
       or nil,
     dependencies = {
       "rafamadriz/friendly-snippets",
@@ -42,7 +42,9 @@ return {
       "saadparwaiz1/cmp_luasnip",
     },
     opts = function()
+      vim.api.nvim_set_hl(0, "CmpGhostText", { link = "Comment", default = true })
       local cmp = require("cmp")
+      local defaults = require("cmp.config.default")()
       return {
         completion = {
           completeopt = "menu,menuone,noinsert",
@@ -82,9 +84,10 @@ return {
         },
         experimental = {
           ghost_text = {
-            hl_group = "LspCodeLens",
+            hl_group = "CmpGhostText",
           },
         },
+        sorting = defaults.sorting,
       }
     end,
   },
@@ -93,12 +96,28 @@ return {
   {
     "echasnovski/mini.pairs",
     event = "VeryLazy",
-    config = function(_, opts)
-      require("mini.pairs").setup(opts)
-    end,
+    opts = {},
+    keys = {
+      {
+        "<leader>up",
+        function()
+          local Util = require("lazy.core.util")
+          vim.g.minipairs_disable = not vim.g.minipairs_disable
+          if vim.g.minipairs_disable then
+            Util.warn("Disabled auto pairs", { title = "Option" })
+          else
+            Util.info("Enabled auto pairs", { title = "Option" })
+          end
+        end,
+        desc = "Toggle auto pairs",
+      },
+    },
   },
 
-  -- surround
+  -- Fast and feature-rich surround actions. For text that includes
+  -- surrounding characters like brackets or quotes, this allows you
+  -- to select the text inside, change or modify the surrounding characters,
+  -- and more.
   {
     "echasnovski/mini.surround",
     keys = function(_, keys)
@@ -121,39 +140,38 @@ return {
     end,
     opts = {
       mappings = {
-        add = "gza", -- Add surrounding in Normal and Visual modes
-        delete = "gzd", -- Delete surrounding
-        find = "gzf", -- Find surrounding (to the right)
-        find_left = "gzF", -- Find surrounding (to the left)
-        highlight = "gzh", -- Highlight surrounding
-        replace = "gzr", -- Replace surrounding
-        update_n_lines = "gzn", -- Update `n_lines`
+        add = "gsa", -- Add surrounding in Normal and Visual modes
+        delete = "gsd", -- Delete surrounding
+        find = "gsf", -- Find surrounding (to the right)
+        find_left = "gsF", -- Find surrounding (to the left)
+        highlight = "gsh", -- Highlight surrounding
+        replace = "gsr", -- Replace surrounding
+        update_n_lines = "gsn", -- Update `n_lines`
       },
     },
-    config = function(_, opts)
-      -- use gz mappings instead of s to prevent conflict with leap
-      require("mini.surround").setup(opts)
-    end,
   },
 
   -- comments
-  { "JoosepAlviste/nvim-ts-context-commentstring", lazy = true },
+  {
+    "JoosepAlviste/nvim-ts-context-commentstring",
+    lazy = true,
+    opts = {
+      enable_autocmd = false,
+    },
+  },
   {
     "echasnovski/mini.comment",
     event = "VeryLazy",
     opts = {
-      hooks = {
-        pre = function()
-          require("ts_context_commentstring.internal").update_commentstring({})
+      options = {
+        custom_commentstring = function()
+          return require("ts_context_commentstring.internal").calculate_commentstring() or vim.bo.commentstring
         end,
       },
     },
-    config = function(_, opts)
-      require("mini.comment").setup(opts)
-    end,
   },
 
-  -- better text-objects
+  -- Better text-objects
   {
     "echasnovski/mini.ai",
     -- keys = {
@@ -161,7 +179,6 @@ return {
     --   { "i", mode = { "x", "o" } },
     -- },
     event = "VeryLazy",
-    dependencies = { "nvim-treesitter-textobjects" },
     opts = function()
       local ai = require("mini.ai")
       return {
@@ -173,13 +190,14 @@ return {
           }, {}),
           f = ai.gen_spec.treesitter({ a = "@function.outer", i = "@function.inner" }, {}),
           c = ai.gen_spec.treesitter({ a = "@class.outer", i = "@class.inner" }, {}),
+          t = { "<([%p%w]-)%f[^<%w][^<>]->.-</%1>", "^<.->().*()</[^/]->$" },
         },
       }
     end,
     config = function(_, opts)
       require("mini.ai").setup(opts)
       -- register all text objects with which-key
-      if require("lazyvim.util").has("which-key.nvim") then
+      require("lazyvim.util").on_load("which-key.nvim", function()
         ---@type table<string, string|table>
         local i = {
           [" "] = "Whitespace",
@@ -220,7 +238,7 @@ return {
           i = i,
           a = a,
         })
-      end
+      end)
     end,
   },
 }

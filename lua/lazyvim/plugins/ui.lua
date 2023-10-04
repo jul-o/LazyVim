@@ -8,7 +8,7 @@ return {
         function()
           require("notify").dismiss({ silent = true, pending = true })
         end,
-        desc = "Delete all Notifications",
+        desc = "Dismiss all Notifications",
       },
     },
     opts = {
@@ -49,7 +49,8 @@ return {
     end,
   },
 
-  -- bufferline
+  -- This is what powers LazyVim's fancy-looking
+  -- tabs, which include filetype icons and close buttons.
   {
     "akinsho/bufferline.nvim",
     event = "VeryLazy",
@@ -59,6 +60,10 @@ return {
     },
     opts = {
       options = {
+        -- stylua: ignore
+        close_command = function(n) require("mini.bufremove").delete(n, false) end,
+        -- stylua: ignore
+        right_mouse_command = function(n) require("mini.bufremove").delete(n, false) end,
         diagnostics = "nvim_lsp",
         always_show_bufferline = false,
         diagnostics_indicator = function(_, _, diag)
@@ -85,14 +90,7 @@ return {
     event = "VeryLazy",
     opts = function()
       local icons = require("lazyvim.config").icons
-
-      local function fg(name)
-        return function()
-          ---@type {foreground?:number}?
-          local hl = vim.api.nvim_get_hl_by_name(name, true)
-          return hl and hl.foreground and { fg = string.format("#%06x", hl.foreground) }
-        end
-      end
+      local Util = require("lazyvim.util")
 
       return {
         options = {
@@ -126,15 +124,21 @@ return {
             {
               function() return require("noice").api.status.command.get() end,
               cond = function() return package.loaded["noice"] and require("noice").api.status.command.has() end,
-              color = fg("Statement")
+              color = Util.fg("Statement"),
             },
             -- stylua: ignore
             {
               function() return require("noice").api.status.mode.get() end,
               cond = function() return package.loaded["noice"] and require("noice").api.status.mode.has() end,
-              color = fg("Constant") ,
+              color = Util.fg("Constant"),
             },
-            { require("lazy.status").updates, cond = require("lazy.status").has_updates, color = fg("Special") },
+            -- stylua: ignore
+            {
+              function() return "  " .. require("dap").status() end,
+              cond = function () return package.loaded["dap"] and require("dap").status() ~= "" end,
+              color = Util.fg("Debug"),
+            },
+            { require("lazy.status").updates, cond = require("lazy.status").has_updates, color = Util.fg("Special") },
             {
               "diff",
               symbols = {
@@ -162,21 +166,38 @@ return {
   -- indent guides for Neovim
   {
     "lukas-reineke/indent-blankline.nvim",
-    event = { "BufReadPost", "BufNewFile" },
+    event = "LazyFile",
     opts = {
-      -- char = "▏",
-      char = "│",
-      filetype_exclude = { "help", "alpha", "dashboard", "neo-tree", "Trouble", "lazy" },
-      show_trailing_blankline_indent = false,
-      show_current_context = false,
+      indent = {
+        char = "│",
+        tab_char = "│",
+      },
+      scope = { enabled = false },
+      exclude = {
+        filetypes = {
+          "help",
+          "alpha",
+          "dashboard",
+          "neo-tree",
+          "Trouble",
+          "lazy",
+          "mason",
+          "notify",
+          "toggleterm",
+          "lazyterm",
+        },
+      },
     },
+    main = "ibl",
   },
 
-  -- active indent guide and indent text objects
+  -- Active indent guide and indent text objects. When you're browsing
+  -- code, this highlights the current level of indentation, and animates
+  -- the highlighting.
   {
     "echasnovski/mini.indentscope",
     version = false, -- wait till new 0.7.0 release to put it back on semver
-    event = { "BufReadPre", "BufNewFile" },
+    event = "LazyFile",
     opts = {
       -- symbol = "▏",
       symbol = "│",
@@ -184,18 +205,36 @@ return {
     },
     init = function()
       vim.api.nvim_create_autocmd("FileType", {
-        pattern = { "help", "alpha", "dashboard", "neo-tree", "Trouble", "lazy", "mason" },
+        pattern = {
+          "help",
+          "alpha",
+          "dashboard",
+          "neo-tree",
+          "Trouble",
+          "lazy",
+          "mason",
+          "notify",
+          "toggleterm",
+          "lazyterm",
+        },
         callback = function()
           vim.b.miniindentscope_disable = true
         end,
       })
     end,
-    config = function(_, opts)
-      require("mini.indentscope").setup(opts)
+  },
+
+  -- Displays a popup with possible key bindings of the command you started typing
+  {
+    "folke/which-key.nvim",
+    opts = function(_, opts)
+      if require("lazyvim.util").has("noice.nvim") then
+        opts.defaults["<leader>sn"] = { name = "+noice" }
+      end
     end,
   },
 
-  -- noicer ui
+  -- Highly experimental plugin that completely replaces the UI for messages, cmdline and the popupmenu.
   {
     "folke/noice.nvim",
     event = "VeryLazy",
@@ -204,12 +243,27 @@ return {
         override = {
           ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
           ["vim.lsp.util.stylize_markdown"] = true,
+          ["cmp.entry.get_documentation"] = true,
+        },
+      },
+      routes = {
+        {
+          filter = {
+            event = "msg_show",
+            any = {
+              { find = "%d+L, %d+B" },
+              { find = "; after #%d+" },
+              { find = "; before #%d+" },
+            },
+          },
+          view = "mini",
         },
       },
       presets = {
         bottom_search = true,
         command_palette = true,
         long_message_to_split = true,
+        inc_rename = true,
       },
     },
     -- stylua: ignore
@@ -218,36 +272,38 @@ return {
       { "<leader>snl", function() require("noice").cmd("last") end, desc = "Noice Last Message" },
       { "<leader>snh", function() require("noice").cmd("history") end, desc = "Noice History" },
       { "<leader>sna", function() require("noice").cmd("all") end, desc = "Noice All" },
+      { "<leader>snd", function() require("noice").cmd("dismiss") end, desc = "Dismiss All" },
       { "<c-f>", function() if not require("noice.lsp").scroll(4) then return "<c-f>" end end, silent = true, expr = true, desc = "Scroll forward", mode = {"i", "n", "s"} },
       { "<c-b>", function() if not require("noice.lsp").scroll(-4) then return "<c-b>" end end, silent = true, expr = true, desc = "Scroll backward", mode = {"i", "n", "s"}},
     },
   },
 
-  -- dashboard
+  -- Dashboard. This runs when neovim starts, and is what displays
+  -- the "LAZYVIM" banner.
   {
     "goolord/alpha-nvim",
     event = "VimEnter",
     opts = function()
       local dashboard = require("alpha.themes.dashboard")
       local logo = [[
-      ██╗      █████╗ ███████╗██╗   ██╗██╗   ██╗██╗███╗   ███╗          Z
-      ██║     ██╔══██╗╚══███╔╝╚██╗ ██╔╝██║   ██║██║████╗ ████║      Z    
-      ██║     ███████║  ███╔╝  ╚████╔╝ ██║   ██║██║██╔████╔██║   z       
-      ██║     ██╔══██║ ███╔╝    ╚██╔╝  ╚██╗ ██╔╝██║██║╚██╔╝██║ z         
-      ███████╗██║  ██║███████╗   ██║    ╚████╔╝ ██║██║ ╚═╝ ██║
-      ╚══════╝╚═╝  ╚═╝╚══════╝   ╚═╝     ╚═══╝  ╚═╝╚═╝     ╚═╝
+           ██╗      █████╗ ███████╗██╗   ██╗██╗   ██╗██╗███╗   ███╗          Z
+           ██║     ██╔══██╗╚══███╔╝╚██╗ ██╔╝██║   ██║██║████╗ ████║      Z    
+           ██║     ███████║  ███╔╝  ╚████╔╝ ██║   ██║██║██╔████╔██║   z       
+           ██║     ██╔══██║ ███╔╝    ╚██╔╝  ╚██╗ ██╔╝██║██║╚██╔╝██║ z         
+           ███████╗██║  ██║███████╗   ██║    ╚████╔╝ ██║██║ ╚═╝ ██║
+           ╚══════╝╚═╝  ╚═╝╚══════╝   ╚═╝     ╚═══╝  ╚═╝╚═╝     ╚═╝
       ]]
 
       dashboard.section.header.val = vim.split(logo, "\n")
       dashboard.section.buttons.val = {
-        dashboard.button("f", " " .. " Find file", ":Telescope find_files <CR>"),
-        dashboard.button("n", " " .. " New file", ":ene <BAR> startinsert <CR>"),
-        dashboard.button("r", " " .. " Recent files", ":Telescope oldfiles <CR>"),
-        dashboard.button("g", " " .. " Find text", ":Telescope live_grep <CR>"),
-        dashboard.button("c", " " .. " Config", ":e $MYVIMRC <CR>"),
-        dashboard.button("s", " " .. " Restore Session", [[:lua require("persistence").load() <cr>]]),
-        dashboard.button("l", "󰒲 " .. " Lazy", ":Lazy<CR>"),
-        dashboard.button("q", " " .. " Quit", ":qa<CR>"),
+        dashboard.button("f", " " .. " Find file", "<cmd> Telescope find_files <cr>"),
+        dashboard.button("n", " " .. " New file", "<cmd> ene <BAR> startinsert <cr>"),
+        dashboard.button("r", " " .. " Recent files", "<cmd> Telescope oldfiles <cr>"),
+        dashboard.button("g", " " .. " Find text", "<cmd> Telescope live_grep <cr>"),
+        dashboard.button("c", " " .. " Config", "<cmd> e $MYVIMRC <cr>"),
+        dashboard.button("s", " " .. " Restore Session", [[<cmd> lua require("persistence").load() <cr>]]),
+        dashboard.button("l", "󰒲 " .. " Lazy", "<cmd> Lazy <cr>"),
+        dashboard.button("q", " " .. " Quit", "<cmd> qa <cr>"),
       }
       for _, button in ipairs(dashboard.section.buttons.val) do
         button.opts.hl = "AlphaButtons"
@@ -285,7 +341,9 @@ return {
     end,
   },
 
-  -- lsp symbol navigation for lualine
+  -- lsp symbol navigation for lualine. This shows where
+  -- in the code structure you are - within functions, classes,
+  -- etc - in the statusline.
   {
     "SmiteshP/nvim-navic",
     lazy = true,
