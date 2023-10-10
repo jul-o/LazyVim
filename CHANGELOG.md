@@ -1,5 +1,176 @@
 # Changelog
 
+## [9.8.0](https://github.com/LazyVim/LazyVim/compare/v9.7.0...v9.8.0) (2023-10-09)
+
+
+### Features
+
+* **cmp:** ctrl+CR will abort cmp and enter a new line ([d894556](https://github.com/LazyVim/LazyVim/commit/d894556c375c1c2398f170c21f9323c9c1eba9d4))
+* **dashboard:** show loaded/count plugins on dashboard instead of just count ([9670c8a](https://github.com/LazyVim/LazyVim/commit/9670c8a400100d38e15c9662f488232508bfb1bb))
+* **edgy:** when edgy is enabled, use edgy's main window for Telescope to open results in ([fb70170](https://github.com/LazyVim/LazyVim/commit/fb7017005809d6be06a1ece748ef2406c37a34d9))
+* **options:** set `virtualedit=block` by default ([6b857f1](https://github.com/LazyVim/LazyVim/commit/6b857f1de648292f2410f9beaa95318bd30454d5))
+* **telescope:** add telescope-fzf-native by default. Will only be enabled if `make` is on your system. ([44984dc](https://github.com/LazyVim/LazyVim/commit/44984dcbe25c13e0e1bc582d5a51ccc2a4be8f70))
+* **telescope:** smarter way to determine the window to open a file in ([c0ce89f](https://github.com/LazyVim/LazyVim/commit/c0ce89fe62bffc0fe35bf76d3e5f501c8b5276c2))
+
+
+### Bug Fixes
+
+* **autocmds:** extra check that we didn't do last_loc more than once for the buffer ([5d44c97](https://github.com/LazyVim/LazyVim/commit/5d44c976a746e29cfe52ceab93dd3de5db2eafa8))
+* **cmp:** set default group_index to 1 to prevent issues with custom sources ([0a05888](https://github.com/LazyVim/LazyVim/commit/0a05888d992b37749f9aae25c7f63f2534ec1024))
+* **edgy:** typo ([9357ea2](https://github.com/LazyVim/LazyVim/commit/9357ea2881fdd57b028256597c01e15601c29aaf))
+* **project:** make sure to load telescope extension after telescope ran setup ([0955129](https://github.com/LazyVim/LazyVim/commit/0955129796749651e1413006e36e9a1c6d3027f3))
+* **telescope:** remove telescope folding hack since PR with fix has been merged upstream ([02bc414](https://github.com/LazyVim/LazyVim/commit/02bc41412a14c1c0bb823421ef82ff5596f42571))
+* **util:** dont schedule on_load ([4e8a88f](https://github.com/LazyVim/LazyVim/commit/4e8a88fc1f28d0420aa3badb703296f344d89968))
+
+## [9.7.0](https://github.com/LazyVim/LazyVim/compare/v9.6.0...v9.7.0) (2023-10-09)
+
+
+### Features
+
+* **black:** added an extra for black with none-ls & conform.nvim ([#1245](https://github.com/LazyVim/LazyVim/issues/1245)) ([5219cad](https://github.com/LazyVim/LazyVim/commit/5219cad564152337d5d48572466ac976f300a557))
+* **cmp:** added custom comparator to prioritize AI sources like copilot and codeium ([eddd3af](https://github.com/LazyVim/LazyVim/commit/eddd3af3512133f22eb26dda81c3c6f871453276))
+* **cmp:** removed priority comparator in favor of source priorities for copilot/codeium ([bff3a99](https://github.com/LazyVim/LazyVim/commit/bff3a996971c1f526eb893d8e778daa19a4245b5))
+* **codeium:** added lualine component with codeium status similar to copilot ([b05783d](https://github.com/LazyVim/LazyVim/commit/b05783de8c518c8a6e5c3f648448c3a6f00d0050))
+* **codeium:** use actual codeium icon ([302c1ff](https://github.com/LazyVim/LazyVim/commit/302c1ff66e5b1d7bbe95f29e81c2d642e2cd4468))
+
+
+### Bug Fixes
+
+* **black:** remove unknown blackd from conform ([#1640](https://github.com/LazyVim/LazyVim/issues/1640)) ([1779858](https://github.com/LazyVim/LazyVim/commit/177985842665921e11f9e9813348fd6bef852e27))
+* **bufferline:** fix bufferline when restoring a session ([838ce85](https://github.com/LazyVim/LazyVim/commit/838ce85ad6ae2dc2fa1d7518b0c5eb1eb8fe29b2))
+* **cmp:** properly set cmp `group_index` to fix issues with copilot and other sources ([#1639](https://github.com/LazyVim/LazyVim/issues/1639)) ([de93848](https://github.com/LazyVim/LazyVim/commit/de93848f584b3443204247f49b405b81b0a3d4c1))
+* **lualine:** only show statusline as soon as lualine loads ([dd55cbd](https://github.com/LazyVim/LazyVim/commit/dd55cbdc99021267bee8260c224582a053552dfe))
+* **options:** set sessionoptions the same as persistence ([502d324](https://github.com/LazyVim/LazyVim/commit/502d32490b29e7f52b2941cfa6a306b45633d63e))
+* **plugins:** make sure init specs are loaded first ([51e25a9](https://github.com/LazyVim/LazyVim/commit/51e25a94b4ff2339028bdded993756360145d1b3))
+
+
+### Performance Improvements
+
+* **util:** closure for get_clients to prevent loading vim.lsp cascade early ([1eac633](https://github.com/LazyVim/LazyVim/commit/1eac633c4f0621d5bd07db1ab7d563db5b342e82))
+
+## [9.6.0](https://github.com/LazyVim/LazyVim/compare/v9.5.0...v9.6.0) (2023-10-08)
+
+
+### Features
+
+* **extra:** add extra `util.dot` that configures multiple ft and treesitter langs when needed ([639a6e7](https://github.com/LazyVim/LazyVim/commit/639a6e7545830602c09711b3757a28537baf8e75))
+
+
+### Bug Fixes
+
+* **config:** trigger LazyFile additionally on BufWritePre for saving unnamed files ([e11a3cb](https://github.com/LazyVim/LazyVim/commit/e11a3cbe800a1216062f7cefd25827f6fdad9daa))
+* **yaml:** yaml schemas are a dict, not a list, so merge properly. Fixes [#1636](https://github.com/LazyVim/LazyVim/issues/1636) ([33c677a](https://github.com/LazyVim/LazyVim/commit/33c677a55e97ee115ad7050856856df7cd96b3e1))
+
+## [9.5.0](https://github.com/LazyVim/LazyVim/compare/v9.4.1...v9.5.0) (2023-10-08)
+
+
+### Features
+
+* **treesitter:** add diff, jsonc and yaml by default ([c9bbb92](https://github.com/LazyVim/LazyVim/commit/c9bbb922e58b223d49785cddbed2feeea536237e))
+
+
+### Bug Fixes
+
+* **util:** fixup typo vim.lsp.get_active_clients ([eebdcec](https://github.com/LazyVim/LazyVim/commit/eebdceca1723801e1889d2a65bd676d17139fc6c))
+
+## [9.4.1](https://github.com/LazyVim/LazyVim/compare/v9.4.0...v9.4.1) (2023-10-08)
+
+
+### Bug Fixes
+
+* **config:** dont append LazyVim early to the rtp when bootstrapping ([4e0a058](https://github.com/LazyVim/LazyVim/commit/4e0a05808cb0997e0ac7d939421f68e9dfa5d74d))
+* **util:** fixed lsp willRenameFiles support check ([21ee35f](https://github.com/LazyVim/LazyVim/commit/21ee35f7108f4eefbce84d88a002572b168fc357))
+
+## [9.4.0](https://github.com/LazyVim/LazyVim/compare/v9.3.1...v9.4.0) (2023-10-08)
+
+
+### Features
+
+* **codeium:** add codeium extra ([#1619](https://github.com/LazyVim/LazyVim/issues/1619)) ([af9e452](https://github.com/LazyVim/LazyVim/commit/af9e4528543d98bccce333d39eccc34e433ef6dc))
+* **keymaps:** added support for lazy's per-mode keymap disabling ([1bc7827](https://github.com/LazyVim/LazyVim/commit/1bc78272da28821479e98df528d399214a8cdbee))
+* **nlua:** make lua dap keybindings buffer-local ([9372d78](https://github.com/LazyVim/LazyVim/commit/9372d78e7e4ed46612de9818868373da81b6f4f1))
+
+
+### Bug Fixes
+
+* **alpha:** reset laststatus when alpha unloads. Fixes [#1623](https://github.com/LazyVim/LazyVim/issues/1623) ([30d5735](https://github.com/LazyVim/LazyVim/commit/30d573502a2f9264273a14143e6bddb0b876a391))
+
+
+### Performance Improvements
+
+* **navic:** enable lazy_update_context option to update context on "CursorHold" instead of of using default "CursorMove" ([#1620](https://github.com/LazyVim/LazyVim/issues/1620)) ([3c92fa4](https://github.com/LazyVim/LazyVim/commit/3c92fa4eb04f827c79c095905ca9391d540fea79))
+
+## [9.3.1](https://github.com/LazyVim/LazyVim/compare/v9.3.0...v9.3.1) (2023-10-07)
+
+
+### Bug Fixes
+
+* **config:** trigger all buf filetype events on LazyFile ([862e140](https://github.com/LazyVim/LazyVim/commit/862e140a7ad8452cd5a103982687fca63a2f44da))
+* **rust:** explicitly enable nvim-cmp source registration for crates ([#1609](https://github.com/LazyVim/LazyVim/issues/1609)) ([237be9e](https://github.com/LazyVim/LazyVim/commit/237be9e3a7f5ca8165d4242d47df34d8d407f4cc))
+* **treesitter-textobjects:** use normal ]c,]C,[c,[C when in diff-mode instead of goto class. Fixes [#1610](https://github.com/LazyVim/LazyVim/issues/1610) ([1935486](https://github.com/LazyVim/LazyVim/commit/1935486ff143dd5cf100b8c89204dc01d8e06021))
+* **ui:** properly handly signs without name. Fixes [#1612](https://github.com/LazyVim/LazyVim/issues/1612) ([0fcdbe2](https://github.com/LazyVim/LazyVim/commit/0fcdbe20daf44f00252668b3866b19ac18b339df))
+
+## [9.3.0](https://github.com/LazyVim/LazyVim/compare/v9.2.0...v9.3.0) (2023-10-06)
+
+
+### Features
+
+* **bufremove:** ask to save changes before trying to remove a buffer ([54df3e2](https://github.com/LazyVim/LazyVim/commit/54df3e26aca5c5c4da746f210e6f7e7de30673bb))
+
+
+### Bug Fixes
+
+* **tailwind:** nil check for filetypes_include. Fixes [#1607](https://github.com/LazyVim/LazyVim/issues/1607) ([d8f4382](https://github.com/LazyVim/LazyVim/commit/d8f4382dd3850550076b33d64a5f455daf7e6450))
+
+
+### Performance Improvements
+
+* **config:** only enable LazyFile when opening a file from the cmdline ([11c9084](https://github.com/LazyVim/LazyVim/commit/11c9084ec576c8735a87550f7975640eb75e6ff7))
+
+## [9.2.0](https://github.com/LazyVim/LazyVim/compare/v9.1.1...v9.2.0) (2023-10-06)
+
+
+### Features
+
+* **conform:** ignore formatting errors for injected languages and fix condition example ([a1c5886](https://github.com/LazyVim/LazyVim/commit/a1c5886947e20059ad7802e71e0a82b413af6657))
+
+
+### Bug Fixes
+
+* **config:** fixed issues related to LazyFile. Fixes [#1601](https://github.com/LazyVim/LazyVim/issues/1601) ([6e0e01f](https://github.com/LazyVim/LazyVim/commit/6e0e01f5b4dd7e97abbb50241a207d36d0ce9cd5))
+* **elixir:** only enable credo when installed. Fixes [#1546](https://github.com/LazyVim/LazyVim/issues/1546) ([8a1de2b](https://github.com/LazyVim/LazyVim/commit/8a1de2b90a699bdfee704f3d4422e2ced18ae0f3))
+* **which-key:** change surround group key ([#1598](https://github.com/LazyVim/LazyVim/issues/1598)) ([f1ea518](https://github.com/LazyVim/LazyVim/commit/f1ea518e29a601b773d9c9c94489fc9d273c2dea))
+
+## [9.1.1](https://github.com/LazyVim/LazyVim/compare/v9.1.0...v9.1.1) (2023-10-05)
+
+
+### Bug Fixes
+
+* **ui:** include extmark signs in signcolumn. Fixes [#1596](https://github.com/LazyVim/LazyVim/issues/1596) ([337cfdb](https://github.com/LazyVim/LazyVim/commit/337cfdbec43003cb2c269e59b27167aa752bf41f))
+
+## [9.1.0](https://github.com/LazyVim/LazyVim/compare/v9.0.2...v9.1.0) (2023-10-05)
+
+
+### Features
+
+* **dashboard:** add projects if enabled ([#1595](https://github.com/LazyVim/LazyVim/issues/1595)) ([6f1cdfe](https://github.com/LazyVim/LazyVim/commit/6f1cdfe4bd2ec9a85c92a312fa52ba86e02d1a9f))
+
+
+### Bug Fixes
+
+* **dasboard:** disable alpha only once ([d6b56c0](https://github.com/LazyVim/LazyVim/commit/d6b56c075e88ce12e9e16fb2eeeea38fb7853600))
+* **options:** set default laststatus=3 and set it to 0 before loading dashboard to prevent flickering ([1eb0192](https://github.com/LazyVim/LazyVim/commit/1eb019274b5564e66ac6c7e119c140bae262e10c))
+* **tailwind:** allow overriding filetypes. Fixes [#1590](https://github.com/LazyVim/LazyVim/issues/1590) ([d3e7f77](https://github.com/LazyVim/LazyVim/commit/d3e7f7717e960bb883b35e9a75badfd5b938cace))
+
+## [9.0.2](https://github.com/LazyVim/LazyVim/compare/v9.0.1...v9.0.2) (2023-10-04)
+
+
+### Bug Fixes
+
+* **autocmds:** last_loc autocmd didn't work correctly for first opened file ([0cc80b1](https://github.com/LazyVim/LazyVim/commit/0cc80b1b0594516ccc2c1e6c9a60c84012a29abb))
+* **bufferline:** load bufferline on VeryLazy. Fixes [#1587](https://github.com/LazyVim/LazyVim/issues/1587) ([7272b3e](https://github.com/LazyVim/LazyVim/commit/7272b3e4b5b626597658dabf774998057892d066))
+* **treesitter:** dont enable ]c, [c, ... in diff-mode ([86de423](https://github.com/LazyVim/LazyVim/commit/86de423ef029abd085531e18b197a5f90e201d98))
+
 ## [9.0.1](https://github.com/LazyVim/LazyVim/compare/v9.0.0...v9.0.1) (2023-10-04)
 
 

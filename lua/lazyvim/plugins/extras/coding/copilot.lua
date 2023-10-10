@@ -33,7 +33,13 @@ return {
           return icon .. (status.message or "")
         end,
         cond = function()
-          local ok, clients = pcall(vim.lsp.get_active_clients, { name = "copilot", bufnr = 0 })
+          if not package.loaded["copilot"] then
+            return
+          end
+          local ok, clients = pcall(require("lazyvim.util").get_clients, { name = "copilot", bufnr = 0 })
+          if not ok then
+            return false
+          end
           return ok and #clients > 0
         end,
         color = function()
@@ -70,9 +76,11 @@ return {
     },
     ---@param opts cmp.ConfigSchema
     opts = function(_, opts)
-      table.insert(opts.sources, 1, { name = "copilot", group_index = 2 })
-      opts.sorting = opts.sorting or require("cmp.config.default")().sorting
-      table.insert(opts.sorting.comparators, 1, require("copilot_cmp.comparators").prioritize)
+      table.insert(opts.sources, 1, {
+        name = "copilot",
+        group_index = 1,
+        priority = 100,
+      })
     end,
   },
 }

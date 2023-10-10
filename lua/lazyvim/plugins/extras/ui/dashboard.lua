@@ -4,10 +4,6 @@ return {
   {
     "glepnir/dashboard-nvim",
     event = "VimEnter",
-    dependencies = {
-      -- disable alpha
-      { "goolord/alpha-nvim", enabled = false },
-    },
     opts = function()
       local logo = [[
            ██╗      █████╗ ███████╗██╗   ██╗██╗   ██╗██╗███╗   ███╗          Z
@@ -22,6 +18,11 @@ return {
 
       local opts = {
         theme = "doom",
+        hide = {
+          -- this is taken care of by lualine
+          -- enabling this messes up the actual laststatus setting after loading a file
+          statusline = false,
+        },
         config = {
           header = vim.split(logo, "\n"),
           center = {
@@ -37,7 +38,7 @@ return {
           footer = function()
             local stats = require("lazy").stats()
             local ms = (math.floor(stats.startuptime * 100 + 0.5) / 100)
-            return { "⚡ Neovim loaded " .. stats.count .. " plugins in " .. ms .. "ms" }
+            return { "⚡ Neovim loaded " .. stats.loaded .. "/" .. stats.count .. " plugins in " .. ms .. "ms" }
           end,
         },
       }
@@ -56,6 +57,7 @@ return {
           end,
         })
       end
+
       return opts
     end,
   },
